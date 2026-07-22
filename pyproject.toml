@@ -1,23 +1,50 @@
-[tool.poetry]
+[project]
 name = "electricity-cost-dkk"
 version = "0.1.0"
 description = "Calculate electricity costs including all fees and taxes from Nord Pool for Denmark"
-authors = ["Victor Faurschou <mail@victorfaurschou.com>"]
+authors = [
+    {name = "Victor Faurschou", email = "mail@victorfaurschou.com"}
+]
 readme = "README.md"
+license = "MIT"
+requires-python = ">=3.9"
+keywords = ["denmark", "electricity", "nordpool", "eloverblik"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Utilities",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "requests (>=2.32.0,<3.0.0)",
+    "python-dotenv (>=1.0.0,<2.0.0)"
+]
+
+[project.urls]
+Repository = "https://github.com/victorfaurschou/electricity-cost-dkk"
+Issues = "https://github.com/victorfaurschou/electricity-cost-dkk/issues"
+
+[project.scripts]
+electricity-cost-dkk = "electricity_cost_dkk.__main__:main"
+
+[tool.poetry]
 packages = [
     { include = "electricity_cost_dkk", from = "src" }
 ]
-
-[tool.poetry.dependencies]
-python = "^3.9"
-requests = "^2.32.0"
-python-dotenv = "^1.0.0"
-
-[tool.poetry.group.dev.dependencies]
-ruff = "^0.15.22"
-
-[tool.poetry.scripts]
-electricity-cost-dkk = "electricity_cost_dkk.__main__:main"
 
 [tool.ruff]
 target-version = "py39"
@@ -29,3 +56,8 @@ select = ["E", "F", "I", "UP", "B"]
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "ruff (>=0.15.22,<0.16.0)"
+]
