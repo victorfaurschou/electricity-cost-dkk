@@ -13,12 +13,12 @@ from zoneinfo import ZoneInfo
 
 from dotenv import load_dotenv
 
-from . import eloverblik, nordpool
+from . import __description__, __version__, eloverblik, nordpool
 from .errors import UpstreamError
 
 TIMEZONE = ZoneInfo("Europe/Copenhagen")
 REGIONS = {"EAST": "DK2", "WEST": "DK1"}
-NORDPOOL_HISTORY_DAYS = 62  # empirically observed rolling window on Nord Pool's public API
+NORDPOOL_HISTORY_DAYS = 62
 
 
 def fail(message: str) -> NoReturn:
@@ -33,13 +33,14 @@ class ArgumentParser(argparse.ArgumentParser):
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = ArgumentParser(prog="electricity-cost-dkk")
-    parser.add_argument("--config", metavar="PATH", help="load config from PATH instead of auto-detecting .env")
+    parser = ArgumentParser(prog="electricity-cost-dkk", description=__description__)
+    parser.add_argument("--config", metavar="PATH", help="load config from PATH")
+    parser.add_argument("--version", action="version", version=__version__)
     parser.add_argument(
         "date",
         nargs="?",
         metavar="YYYY-MM-DD",
-        help="fetch prices for a specific date (up to tomorrow)",
+        help="optional date to fetch prices for (default: current date; last 62 days up to tomorrow)",
     )
     return parser
 

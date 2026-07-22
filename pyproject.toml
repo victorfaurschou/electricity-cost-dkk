@@ -1,7 +1,7 @@
 [project]
 name = "electricity-cost-dkk"
 version = "0.1.0"
-description = "Calculate electricity costs including all fees and taxes from Nord Pool for Denmark"
+description = "Combines spot prices, grid tariffs, and provider markup to calculate the total hourly electricity cost for a given day, including all applicable fees and taxes."
 authors = [
     {name = "Victor Faurschou", email = "mail@victorfaurschou.com"}
 ]
