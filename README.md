@@ -7,17 +7,42 @@ Combines spot prices, grid tariffs, and provider markup to calculate the total h
 ### Install
 
 ```sh
+pip install electricity-cost-dkk
+```
+
+Alternatively, install from source:
+
+```sh
+git clone https://github.com/victorfaurschou/electricity-cost-dkk.git
+cd electricity-cost-dkk
 poetry install
 ```
 
 ### Configure
 
-1. Copy `.env.example` to `.env`
-2. Set your region (`EAST` or `WEST` - Sjælland, Lolland-Falster, Møn and Bornholm is East; Jylland and Fyn is West)
-3. Set your metering point ID and API token from [eloverblik.dk](https://eloverblik.dk)
-4. Set your provider's markup (can usually be found on your billing statement)
+Create a `.env` file in the directory you'll run the command from (if installed from source, you can copy `.env.example` to `.env` instead), and set:
+
+```
+REGION=
+ELOVERBLIK_METERING_POINT_ID=
+ELOVERBLIK_TOKEN=
+PROVIDER_MARKUP=
+VAT_RATE=0.25
+```
+
+1. Set your region (`EAST` or `WEST` - Sjælland, Lolland-Falster, Møn and Bornholm is East; Jylland and Fyn is West)
+2. Set your metering point ID and API token from [eloverblik.dk](https://eloverblik.dk)
+3. Set your provider's markup (can usually be found on your billing statement)
+
+Alternatively, pass `--config PATH` to load configuration from a specific file instead of the `.env` in the current directory.
 
 ### Run
+
+```sh
+electricity-cost-dkk
+```
+
+Alternatively, if installed from source:
 
 ```sh
 poetry run electricity-cost-dkk
@@ -69,6 +94,8 @@ Example:
 Today's prices are always available, as Nord Pool publishes each day's prices one day in advance. Tomorrow's prices become available once Nord Pool publishes them, typically around 13:00. Requests made before then will return no data.
 
 ## Scope
+
+This tool is primarily a data source rather than an end-user utility. It's intended to be piped into or consumed by other tools, so it doesn't provide a human-friendly output format.
 
 While Nord Pool operates in other countries besides Denmark, this tool assumes Danish structures and won't work directly for other countries.
 

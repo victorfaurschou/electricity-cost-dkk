@@ -1,5 +1,8 @@
 """Electricity costs calculator for Denmark."""
 
+from __future__ import annotations
+
+import argparse
 import json
 import os
 import sys
@@ -16,21 +19,51 @@ from .errors import UpstreamError
 TIMEZONE = ZoneInfo("Europe/Copenhagen")
 REGIONS = {"EAST": "DK2", "WEST": "DK1"}
 NORDPOOL_HISTORY_DAYS = 62  # empirically observed rolling window on Nord Pool's public API
-HELP_TEXT = """Usage: electricity-cost-dkk [YYYY-MM-DD]
-
-ARGUMENTS:
-  YYYY-MM-DD    fetch prices for a specific date (up to tomorrow)
-
-OPTIONS:
-  -h, --help    show this help message
-"""
-
-load_dotenv()
 
 
 def fail(message: str) -> NoReturn:
     print(json.dumps({"error": message}))
     sys.exit(1)
+
+
+class ArgumentParser(argparse.ArgumentParser):
+    def error(self, message: str) -> NoReturn:
+        print(json.dumps({"error": message}))
+        sys.exit(2)
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = ArgumentParser(prog="electricity-cost-dkk")
+    parser.add_argument("--config", metavar="PATH", help="load config from PATH instead of auto-detecting .env")
+    parser.add_argument(
+        "date",
+        nargs="?",
+        metavar="YYYY-MM-DD",
+        help="fetch prices for a specific date (up to tomorrow)",
+    )
+    return parser
+
+
+def parse_args(argv: list[str]) -> argparse.Namespace:
+    return build_parser().parse_args(argv)
+
+
+def load_env(config_path: str | None) -> None:
+    if config_path is not None:
+        if not os.path.isfile(config_path):
+            fail(f"Config file not found: {config_path}")
+        try:
+            load_dotenv(config_path)
+        except OSError as e:
+            fail(f"Could not read config file: {e}")
+        return
+
+    dotenv_path = os.path.join(os.getcwd(), ".env")
+    if os.path.isfile(dotenv_path):
+        try:
+            load_dotenv(dotenv_path)
+        except OSError as e:
+            fail(f"Could not read config file: {e}")
 
 
 REQUIRED_VARS: list[tuple[str, Callable[[str], float | str]]] = [
@@ -66,14 +99,14 @@ def load_config() -> dict[str, Any]:
     }
 
 
-def fetch_spot_prices(region: str) -> tuple[list[float], str]:
+def fetch_spot_prices(region: str, date_str: str | None) -> tuple[list[float], str]:
     today = datetime.now(TIMEZONE).date()
 
-    if len(sys.argv) > 1:
+    if date_str is not None:
         try:
-            query_date = datetime.strptime(sys.argv[1], "%Y-%m-%d").date()
+            query_date = datetime.strptime(date_str, "%Y-%m-%d").date()
         except ValueError:
-            fail(f"Invalid date '{sys.argv[1]}', expected YYYY-MM-DD")
+            fail(f"Invalid date '{date_str}', expected YYYY-MM-DD")
 
         max_date = today + timedelta(days=1)
         if query_date > max_date:
@@ -102,12 +135,11 @@ def fetch_spot_prices(region: str) -> tuple[list[float], str]:
 
 
 def main() -> None:
-    if len(sys.argv) > 1 and sys.argv[1] in ("-h", "--help"):
-        print(HELP_TEXT)
-        sys.exit(0)
+    args = parse_args(sys.argv[1:])
 
+    load_env(args.config)
     config = load_config()
-    hourly_spot, date_str = fetch_spot_prices(config["region"])
+    hourly_spot, date_str = fetch_spot_prices(config["region"], args.date)
 
     try:
         access_token = eloverblik.get_access_token(config["refresh_token"])
