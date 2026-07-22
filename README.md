@@ -20,7 +20,7 @@ poetry install
 
 ### Configure
 
-Create a `.env` file in the directory you'll run the command from (if installed from source, you can copy `.env.example` to `.env` instead), and set:
+Set the following:
 
 ```
 REGION=
@@ -30,11 +30,15 @@ PROVIDER_MARKUP=
 VAT_RATE=0.25
 ```
 
-1. Set your region (`EAST` or `WEST` - Sjælland, Lolland-Falster, Møn and Bornholm is East; Jylland and Fyn is West)
-2. Set your metering point ID and API token from [eloverblik.dk](https://eloverblik.dk)
-3. Set your provider's markup (can usually be found on your billing statement)
+1. Set your region as either `EAST` (Sjælland, Lolland-Falster, Møn and Bornholm) or `WEST` (Jylland and Fyn)
+2. Set your metering point identifier and access token from: [eloverblik.dk](https://eloverblik.dk)
+3. Set your provider's markup (usually be found on your billing statement)
 
-Alternatively, pass `--config PATH` to load configuration from a specific file instead of the `.env` in the current directory.
+You can provide them in any of these ways:
+
+- Export them in your environment.
+- Place a `.env` file in the directory you run the program from (if installed from source, copy `.env.example` as a starting point).
+- Pass `--config PATH` to load them from a specific file instead.
 
 ### Run
 
@@ -48,7 +52,7 @@ Alternatively, if installed from source:
 poetry run electricity-cost-dkk
 ```
 
-By default, the tool fetches today's prices. To fetch prices for a different date, provide a YYYY-MM-DD date instead - any date up to tomorrow's (Nord Pool doesn't publish further ahead).
+By default, the tool fetches today's prices. To fetch prices for a different date, provide a YYYY-MM-DD date instead - any date from the last 62 days up to tomorrow's.
 
 #### Output
 
@@ -91,7 +95,9 @@ Example:
 
 ## Availability
 
-Today's prices are always available, as Nord Pool publishes each day's prices one day in advance. Tomorrow's prices become available once Nord Pool publishes them, typically around 13:00. Requests made before then will return no data.
+Today's prices are always available, as Nord Pool publishes each day's prices one day in advance. Tomorrow's prices become available once Nord Pool publishes them, typically around 13:00. Requests made before then will return no data. Nord Pool doesn't publish further ahead than that.
+
+This day-ahead price data also isn't retained indefinitely - only the past 62 days are available, and requesting an older date will fail.
 
 ## Scope
 
