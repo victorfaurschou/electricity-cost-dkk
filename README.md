@@ -56,7 +56,18 @@ By default, the tool fetches today's prices. To fetch prices for a different dat
 
 #### Output
 
-A JSON object with one entry per hour of the day, each showing a breakdown of cost components (spot price, provider markup, distribution fee, transmission fee, and tax) plus the total cost.
+By default, one line per hour with the total cost:
+
+```
+00:00  1.48 DKK/kWh
+01:00  1.52 DKK/kWh
+...
+17:00  2.31 DKK/kWh
+...
+23:00  1.35 DKK/kWh
+```
+
+Pass `--json` to get a JSON object with one entry per hour, each showing the individual cost components (spot price, provider markup, distribution fee, transmission fee, and tax) plus the total.
 
 Example:
 
@@ -101,7 +112,7 @@ This day-ahead price data also isn't retained indefinitely - only the past 62 da
 
 ## Scope
 
-This tool is primarily a data source rather than an end-user utility. It's intended to be piped into or consumed by other tools, so it doesn't provide a human-friendly output format.
+This tool is primarily a data source rather than an end-user utility. The default output is human-friendly, but pass `--json` when piping into or consuming it from other tools.
 
 While Nord Pool operates in other countries besides Denmark, this tool assumes Danish structures and won't work directly for other countries.
 

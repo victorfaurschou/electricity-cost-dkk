@@ -35,6 +35,7 @@ class ArgumentParser(argparse.ArgumentParser):
 def build_parser() -> argparse.ArgumentParser:
     parser = ArgumentParser(prog="electricity-cost-dkk", description=__description__)
     parser.add_argument("--config", metavar="PATH", help="load config from PATH")
+    parser.add_argument("--json", action="store_true", help="give output as a JSON object")
     parser.add_argument("--version", action="version", version=__version__)
     parser.add_argument(
         "date",
@@ -190,5 +191,10 @@ def main() -> None:
         }
         prices["hours"].append(hour_data)
 
-    print(json.dumps(prices))
+    if args.json:
+        print(json.dumps(prices))
+    else:
+        unit = f"{prices['currency']}/{prices['unit']}"
+        for hour_data in prices["hours"]:
+            print(f"{hour_data['hour']:02d}:00  {hour_data['total']:.2f} {unit}")
     sys.exit(0)
